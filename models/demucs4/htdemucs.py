@@ -16,12 +16,12 @@ from torch.nn import functional as F
 from fractions import Fraction
 from einops import rearrange
 
-from SuperDemucs.utils.models.demucs4.transformer import CrossTransformerEncoder
+from SuperDemucs.models.demucs4.transformer import CrossTransformerEncoder
 
-from SuperDemucs.utils.models.demucs4.demucs import rescale_module
-from SuperDemucs.utils.models.demucs4.states import capture_init
-from SuperDemucs.utils.models.demucs4.spec import spectro, ispectro
-from SuperDemucs.utils.models.demucs4.hdemucs import pad1d, ScaledEmbedding, HEncLayer, MultiWrap, HDecLayer
+from SuperDemucs.models.demucs4.demucs import rescale_module
+from SuperDemucs.models.demucs4.states import capture_init
+from SuperDemucs.models.demucs4.spec import spectro, ispectro
+from SuperDemucs.models.demucs4.hdemucs import pad1d, ScaledEmbedding, HEncLayer, MultiWrap, HDecLayer
 
 
 class HTDemucs(nn.Module):
@@ -659,3 +659,73 @@ class HTDemucs(nn.Module):
         if length_pre_pad:
             x = x[..., :length_pre_pad]
         return x
+
+def get_model(config):
+    model_config = config['htdemucs']
+
+    model = HTDemucs(
+        sources=config['training']['instruments'],
+        audio_channels=config['training']['channels'],
+        channels=model_config['channels'],
+        channels_time=model_config.get('channels_time', None),
+        growth=model_config['growth'],
+        nfft=model_config['nfft'],
+        wiener_iters=model_config['wiener_iters'],
+        end_iters=model_config['end_iters'],
+        wiener_residual=model_config['wiener_residual'],
+        cac=model_config['cac'],
+        depth=model_config['depth'],
+        rewrite=model_config['rewrite'],
+        multi_freqs=model_config['multi_freqs'],
+        multi_freqs_depth=model_config['multi_freqs_depth'],
+        freq_emb=model_config['freq_emb'],
+        emb_scale=model_config['emb_scale'],
+        emb_smooth=model_config['emb_smooth'],
+        kernel_size=model_config['kernel_size'],
+        time_stride=model_config['time_stride'],
+        stride=model_config['stride'],
+        context=model_config['context'],
+        context_enc=model_config['context_enc'],
+        norm_starts=model_config['norm_starts'],
+        norm_groups=model_config['norm_groups'],
+        dconv_mode=model_config['dconv_mode'],
+        dconv_depth=model_config['dconv_depth'],
+        dconv_comp=model_config['dconv_comp'],
+        dconv_init=model_config['dconv_init'],
+        bottom_channels=model_config['bottom_channels'],
+        t_layers=model_config['t_layers'],
+        t_emb=model_config['t_emb'],
+        t_hidden_scale=model_config['t_hidden_scale'],
+        t_heads=model_config['t_heads'],
+        t_dropout=model_config['t_dropout'],
+        t_max_positions=model_config['t_max_positions'],
+        t_norm_in=model_config['t_norm_in'],
+        t_norm_in_group=model_config['t_norm_in_group'],
+        t_group_norm=model_config['t_group_norm'],
+        t_norm_first=model_config['t_norm_first'],
+        t_norm_out=model_config['t_norm_out'],
+        t_max_period=model_config['t_max_period'],
+        t_weight_decay=model_config['t_weight_decay'],
+        t_lr=model_config.get('t_lr', None),
+        t_layer_scale=model_config['t_layer_scale'],
+        t_gelu=model_config['t_gelu'],
+        t_weight_pos_embed=model_config['t_weight_pos_embed'],
+        t_cape_mean_normalize=model_config['t_cape_mean_normalize'],
+        t_cape_augment=model_config['t_cape_augment'],
+        t_cape_glob_loc_scale=model_config['t_cape_glob_loc_scale'],
+        t_sparse_self_attn=model_config['t_sparse_self_attn'],
+        t_sparse_cross_attn=model_config['t_sparse_cross_attn'],
+        t_mask_type=model_config['t_mask_type'],
+        t_mask_random_seed=model_config['t_mask_random_seed'],
+        t_sparse_attn_window=model_config['t_sparse_attn_window'],
+        t_global_window=model_config['t_global_window'],
+        t_sparsity=model_config['t_sparsity'],
+        t_auto_sparsity=model_config['t_auto_sparsity'],
+        t_cross_first=model_config['t_cross_first'],
+        rescale=model_config['rescale'],
+        samplerate=config['training']['samplerate'],
+        segment=config['training']['segment'],
+        use_train_segment=True
+    )
+
+    return model

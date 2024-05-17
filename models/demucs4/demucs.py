@@ -12,9 +12,9 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from SuperDemucs.utils.models.demucs4.states import capture_init
-from SuperDemucs.utils.models.demucs4.utils import center_trim, unfold
-from SuperDemucs.utils.models.demucs4.transformer import LayerScale
+from SuperDemucs.models.demucs4.states import capture_init
+from SuperDemucs.models.demucs4.utils import center_trim, unfold
+from SuperDemucs.models.demucs4.transformer import LayerScale
 
 
 class BLSTM(nn.Module):

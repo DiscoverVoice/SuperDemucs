@@ -15,9 +15,9 @@ import torch
 from torch import nn
 from torch.nn import functional as F
 
-from SuperDemucs.utils.models.demucs4.demucs import DConv, rescale_module
-from SuperDemucs.utils.models.demucs4.states import capture_init
-from SuperDemucs.utils.models.demucs4.spec import spectro, ispectro
+from SuperDemucs.models.demucs4.demucs import DConv, rescale_module
+from SuperDemucs.models.demucs4.states import capture_init
+from SuperDemucs.models.demucs4.spec import spectro, ispectro
 
 
 def pad1d(x: torch.Tensor, paddings: tp.Tuple[int, int], mode: str = 'constant', value: float = 0.):

@@ -106,6 +106,8 @@ training:
   grad_clip: 0
   instruments:
   - vocals
+  - bass
+  - drums
   - other
   lr: 5.0e-05
   patience: 2
@@ -125,12 +127,6 @@ augmentations:
   loudness: true # randomly change loudness of each stem on the range (loudness_min; loudness_max)
   loudness_min: 0.5
   loudness_max: 1.5
-  mixup: true # mix several stems of same type with some probability (only works for dataset types: 1, 2, 3)
-  mixup_probs: !!python/tuple # 2 additional stems of the same type (1st with prob 0.2, 2nd with prob 0.02)
-    - 0.2
-    - 0.02
-  mixup_loudness_min: 0.5
-  mixup_loudness_max: 1.5
 
 inference:
   batch_size: 1
