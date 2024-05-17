@@ -1,15 +1,6 @@
 import musdb
 import torch
 from torch.utils.data import Dataset, DataLoader, random_split
-import os
-import sys
-
-pwd = os.getcwd()
-sys.path.append(os.path.dirname(pwd))
-from paths import p
-
-num_workers = 0
-
 
 class MUSDBDataset(Dataset):
     def __init__(
