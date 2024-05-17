@@ -1,0 +1,18 @@
+dataset:
+  train_data_path: "path_to_train_data"
+  val_data_path: "path_to_val_data"
+  batch_size: 32
+  num_workers: 4
+
+model:
+  name: "AudioSeparationModel"
+  learning_rate: 0.001
+  optimizer: "AdamW"
+  scheduler: "CosineAnnealingWarmRestarts"
+  max_epochs: 50
+  precision: 16
+  accumulate_grad_batches: 2
+  T_0: 10
+  T_mult: 1
+  eta_min: 1e-6
+  save_checkpoint_path: "checkpoints/audio_model"

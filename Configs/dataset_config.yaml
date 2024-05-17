@@ -1,0 +1,9 @@
+musdb:
+  root: "musdb"
+  train_data_path: "train"
+  eval_data_path: "test"
+  target: ["vocals", "drums", "bass", "other"]
+  batch_size: 16
+  shuffle: true
+  val_split: 0.1
+  num_workers: 4
