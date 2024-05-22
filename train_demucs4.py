@@ -1,10 +1,9 @@
+import pytorch_lightning as pl
 from pytorch_lightning.loggers import TensorBoardLogger
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from utils.model_utils import LightningWrapper, load_model
 from utils.config_utils import load_config
-import pytorch_lightning as pl
-import torch
-
+from SuperDemucs.utils.preprocessing_utils.dataset_utils import load_musdb
 
 if __name__ == "__main__":
     config = load_config("demucs4_config.yaml")
@@ -28,8 +27,8 @@ if __name__ == "__main__":
         precision=config['model']['precision'],
         accumulate_grad_batches=config['model']['accumulate_grad_batches']
     )
-
+    train_dataloader, valid_dataloader = load_musdb(config)
     pl_model = LightningWrapper(model, config)
-    trainer.fit(pl_model, train_loader, val_loader)
-    torch.save(pl_model.state_dict(), 'final.pt')
-    pl_model.load_state_dict(torch.load('final.pt'))
+    trainer.fit(pl_model, train_dataloader, valid_dataloader)
+    # torch.save(pl_model.state_dict(), 'final.pt')
+    # pl_model.load_state_dict(torch.load('final.pt'))

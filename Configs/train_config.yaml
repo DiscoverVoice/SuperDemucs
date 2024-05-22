@@ -1,0 +1,19 @@
+model_type: mdx23c
+config_path: path/to/config
+start_check_point: ''
+results_path: path/to/results
+data_path:
+  - path/to/data1
+  - path/to/data2
+dataset_type: 1
+valid_path:
+  - path/to/valid1
+  - path/to/valid2
+num_workers: 0
+pin_memory: False
+seed: 0
+device_ids:
+  - 0
+use_multistft_loss: False
+use_mse_loss: False
+use_l1_loss: False

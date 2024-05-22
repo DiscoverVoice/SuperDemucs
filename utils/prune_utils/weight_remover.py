@@ -1,27 +1,37 @@
-
 import torch
 from scipy.stats import norm
 
+
 class WeightRemover:
-    def __init__(self, model, p=0.9):
-        self.source_model = model
+    def __init__(self, model, device="cuda:0", p=0.8):
+        self.model = model.to(device)
+        self.device = device
         self.p = p
+        self.results = {"layer": [], "input": [], "output": []}
 
-    def propagate(self, ref_layer, target_layer, input_tensor):
-        def hook(layer, input, output):
-            current_weight, current_bias = target_layer.weight, target_layer.bias
-            original_outputs = ref_layer(input[0])
+    def hook(self, layer, input, output):
+        self.results["layer"].append(layer)
+        self.results["input"].append(input[0].to('cpu'))
+        self.results["output"].append(output[0].to('cpu'))
 
-            if torch.sum(current_weight != 0) > torch.numel(current_weight) * self.p:
-                self.remove(layer, output)
-        handle = target_layer.register_forward_hook(hook)
-        out = target_layer(input_tensor)
-        handle.remove()
-        return out
+    def register_hooks(self):
+        handle_list = []
+        for layer in self.model.modules():
+            if isinstance(layer, torch.nn.Linear):
+                handle = layer.register_forward_hook(self.hook)
+                handle_list.append(handle)
+        return handle_list
 
-    def remove(self, layer, output):
-        current_weight, current_bias = layer.weight.clone(), layer.bias.clone()
-        shape = current_weight.shape
+    def remove_hooks(self, handle_list):
+        for handle in handle_list:
+            handle.remove()
+
+    def remove_weights(self, layer):
+        current_weight = layer.weight.clone()
+        if layer.bias is not None:
+            current_bias = layer.bias.clone()
+        else:
+            current_bias = None
 
         mean = torch.mean(current_weight, dim=1, keepdim=True)
         std = torch.std(current_weight, dim=1, keepdim=True)
@@ -32,5 +42,28 @@ class WeightRemover:
 
         current_weight[mask] = 0
         all_zeros = ~mask.any(dim=1)
-        current_bias[all_zeros] = 0
-        set_parameters(layer, current_weight, current_bias)
+        if current_bias is not None:
+            current_bias[all_zeros] = 0
+        self.set_parameters(layer, current_weight, current_bias)
+
+    def set_parameters(self, layer, weight, bias):
+        layer.weight.data = weight
+        if bias is not None:
+            layer.bias.data = bias
+
+    def process(self, input_tensor):
+        self.results = {"layer": [], "input": [], "output": []}
+        handle_list = self.register_hooks()
+        output = self.model(input_tensor.to(self.device))
+        self.remove_hooks(handle_list)
+        return output
+
+    def apply_removal(self):
+        for idx, layer in enumerate(self.results["layer"]):
+            current_weight = layer.weight
+            if torch.sum(current_weight != 0) > torch.numel(current_weight) * self.p:
+                print(f"before {torch.sum(layer.weight != 0)}")
+                self.results["output"][idx] = self.results["output"][idx].to(self.device)
+                self.remove_weights(layer)
+                self.results["output"][idx] = self.results["output"][idx].to('cpu')
+                print(f"after {torch.sum(layer.weight != 0)}")
