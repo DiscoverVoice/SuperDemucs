@@ -16,7 +16,7 @@ if __name__ == "__main__":
     cfg = load_config("train_config.yaml")
     cfg.model_type = "htdemucs"
     cfg.config_path = "Configs/htdemucs_config.yaml"
-    cfg.results_path = "Results/demucs4"
+    cfg.results_path = "Results/htdemucs"
     cfg.data_path = "Datasets/musdb18hq/train"
     cfg.num_workers = 4
     cfg.valid_path = "Datasets/musdb18hq/valid"

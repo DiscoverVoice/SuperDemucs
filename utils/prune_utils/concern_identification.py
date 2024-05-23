@@ -148,9 +148,6 @@ class ConcernIdentification:
                 self.current_results["output"][idx] = self.current_results["output"][idx].to('cpu')
                 print(f"after {torch.sum(layer.weight != 0)}")
 
-    def set_parameters(self, layer, weight, bias):
-        layer.weight.data = weight
-        layer.bias.data = bias
 
 def safe_std(tensor, epsilon=None, unbiased=False, dim=None, keepdim=True):
     if tensor.numel():
