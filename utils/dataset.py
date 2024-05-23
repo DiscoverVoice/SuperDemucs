@@ -664,6 +664,7 @@ def download_musdb():
     return train_data, test_data
 
 def load_data(model_config, cfg, batch_size):
+    download_musdb()
     cfg.data_path = 'Datasets/musdb18hq/train'
     trainset = MSSDataset(
             model_config,
