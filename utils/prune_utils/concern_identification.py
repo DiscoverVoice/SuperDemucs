@@ -3,7 +3,7 @@ from scipy.stats import norm
 
 
 class ConcernIdentification:
-    def __init__(self, ref_model, model, device='cuda:0', p=0.4):
+    def __init__(self, ref_model, model, device='cuda:0', p=0.7):
         self.ref_model = ref_model.to(device)
         self.model = model.to(device)
         self.device = device
@@ -40,6 +40,7 @@ class ConcernIdentification:
         else:
             current_bias = None
         original_weight = ref_model.weight.clone()
+        
         if ref_model.bias is not None:
             original_bias = ref_model.bias.clone()
         else:
@@ -47,6 +48,9 @@ class ConcernIdentification:
         shape = current_weight.shape
 
         output_loss = output - original_output
+        if len(output_loss.shape) > len(shape):
+            output_loss = output_loss[:, 0, :]
+            
         positive_loss_mask = (
             torch.all(output_loss > 0, dim=0).unsqueeze(1).expand(-1, shape[1])
         )

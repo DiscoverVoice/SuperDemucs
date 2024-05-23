@@ -1,34 +1,25 @@
-import pytorch_lightning as pl
-from pytorch_lightning.loggers import TensorBoardLogger
-from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
-from utils.model_utils import LightningWrapper, load_model
+
+import torch
+import copy
+import numpy as np
+from tqdm import tqdm
+import os
+from utils.prune_utils.concern_identification import ConcernIdentification
+from utils.prune_utils.weight_remover import WeightRemover
+from utils.dataset import download_musdb, load_data
+from utils.train import train_model, valid, load_not_compatible_weights, get_model_from_config
 from utils.config_utils import load_config
-from SuperDemucs.utils.preprocessing_utils.dataset_utils import load_musdb
 
 if __name__ == "__main__":
-    config = load_config("demucs4_config.yaml")
-    model = load_model(config)
+    device = 'cuda:0'
+    cfg = load_config('train_config.yaml')
+    cfg.model_type = 'htdemucs'
+    cfg.config_path = 'Configs/htdemucs_config.yaml'
+    cfg.results_path = 'Results/'
+    cfg.data_path = 'Datasets/musdb18hq/train'
+    cfg.num_workers = 4
+    cfg.valid_path = 'Datasets/musdb18hq/valid'
+    cfg.seed = 44
+    cfg.start_check_point = 'Results/model_htdemucs(after prune).ckpt'
 
-    logger = TensorBoardLogger("tb_logs", name=config['model']['name'])
-
-    checkpoint_callback = ModelCheckpoint(
-        monitor='val_loss',
-        dirpath=config['model']['save_checkpoint_path'],
-        save_top_k=3,
-        mode='min',
-    )
-
-    lr_monitor = LearningRateMonitor(logging_interval='step')
-
-    trainer = pl.Trainer(
-        max_epochs=config['model']['max_epochs'],
-        logger=logger,
-        callbacks=[checkpoint_callback, lr_monitor],
-        precision=config['model']['precision'],
-        accumulate_grad_batches=config['model']['accumulate_grad_batches']
-    )
-    train_dataloader, valid_dataloader = load_musdb(config)
-    pl_model = LightningWrapper(model, config)
-    trainer.fit(pl_model, train_dataloader, valid_dataloader)
-    # torch.save(pl_model.state_dict(), 'final.pt')
-    # pl_model.load_state_dict(torch.load('final.pt'))
+    train_model(cfg)
