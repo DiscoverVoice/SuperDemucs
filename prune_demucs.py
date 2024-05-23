@@ -9,6 +9,7 @@ from utils.dataset import load_data
 from utils.train import valid, load_not_compatible_weights, get_model_from_config
 from utils.config_utils import load_config
 from utils.paths import p
+from utils.logger import stdio2logs
 
 logging.basicConfig(filename=os.path.join(p.Logs, 'pruning_demucs.log'),
                     level=logging.INFO,
@@ -19,6 +20,7 @@ torch.backends.cudnn.deterministic = False
 torch.multiprocessing.set_start_method('spawn')
 
 if __name__ == "__main__":
+    stdio2logs()
     logging.info("Starting the pruning script")
     device = 'cuda:0'
     cfg = load_config('train_config.yaml')
