@@ -5,9 +5,8 @@ import time
 import numpy as np
 import torch
 import torch.nn as nn
-import yaml
-from ml_collections import ConfigDict
-from omegaconf import OmegaConf
+from pydub import AudioSegment
+from pathlib import Path
 
 def demix_track(config, model, mix, device):
     C = config.audio.chunk_size
@@ -146,3 +145,16 @@ def sdr(references, estimates):
     num += delta
     den += delta
     return 10 * np.log10(num / den)
+
+
+def convert_mp3_to_wav(file_paths):
+    for file_path in file_paths:
+        path = Path(file_path)
+        if path.suffix.lower() != '.mp3':
+            print(f"Skipping non-mp3 file: {file_path}")
+            continue
+
+        audio = AudioSegment.from_mp3(file_path)
+        wav_file_path = path.with_suffix('.wav')
+        audio.export(wav_file_path, format="wav")
+        print(f"Converted {file_path} to {wav_file_path}")
