@@ -6,7 +6,8 @@ import logging
 from utils.prune_utils.concern_identification import ConcernIdentification
 from utils.prune_utils.weight_remover import WeightRemover
 from utils.dataset import load_data
-from utils.train import valid, load_not_compatible_weights, get_model_from_config
+from utils.train import valid
+from utils.model_utils import get_model_from_config, load_not_compatible_weights
 from utils.config_utils import load_config
 from utils.paths import p
 from utils.logger import stdio2logs

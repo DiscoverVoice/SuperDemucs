@@ -17,7 +17,8 @@ import multiprocessing
 import warnings
 warnings.filterwarnings("ignore")
 
-from audio_utils import demix_track, demix_track_demucs, sdr, get_model_from_config
+from audio_utils import demix_track, demix_track_demucs, sdr
+from utils.model_utils import get_model_from_config
 
 
 def proc_list_of_files(

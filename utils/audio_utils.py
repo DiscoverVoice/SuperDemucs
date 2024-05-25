@@ -147,14 +147,36 @@ def sdr(references, estimates):
     return 10 * np.log10(num / den)
 
 
-def convert_mp3_to_wav(file_paths):
+def convert_mp3_to_wav(file_paths, output_path, verbose=False):
+    output_dir = Path(output_path)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    wav_files = []
     for file_path in file_paths:
         path = Path(file_path)
         if path.suffix.lower() != '.mp3':
-            print(f"Skipping non-mp3 file: {file_path}")
+            if verbose:
+                print(f"Skipping non-mp3 file: {file_path}")
             continue
 
         audio = AudioSegment.from_mp3(file_path)
-        wav_file_path = path.with_suffix('.wav')
+        wav_file_path = output_dir / path.with_suffix('.wav').name
         audio.export(wav_file_path, format="wav")
-        print(f"Converted {file_path} to {wav_file_path}")
+        wav_files.append(wav_file_path)
+        if verbose:
+            print(f"Converted {file_path} to {wav_file_path}")
+
+    return wav_files
+
+def get_audio_list(root_dir, audio_type='.wav', verbose=False):
+    root_path = Path(root_dir)
+    audio_files = []
+    def recur(current_path):
+        for entry in current_path.iterdir():
+            if entry.is_dir():
+                recur(entry)
+            elif entry.suffix.lower() == audio_type:
+                audio_files.append(entry)
+
+    recur(root_path)
+    return audio_files
